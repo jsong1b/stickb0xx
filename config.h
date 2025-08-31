@@ -47,50 +47,68 @@ const int right_index_bot[2]  = {1, 5};
 
 
 
+#define LAYOUT_SWITCHER_COMBO_LEN 5
+bool in_layout_switcher = true;
+const int* layout_switcher_combo[LAYOUT_SWITCHER_COMBO_LEN] = {thumb_left, thumb_midleft, thumb_middle, thumb_midright, thumb_right};
+
+#define SOCD_CLEANERS_LEN 5
+typedef enum SocdCleaner {
+    NONE                     = 0,
+    NEUTRAL                  = 1,
+    LRN_UDU                  = 2, /* left + right = neutral, up + down = up */
+    LIP                      = 3, /* last input priority */
+    B0XX_NEUTRAL_TRAVEL_TIME = 4  /* for things like melee ruleset */
+} SocdCleaner;
+const int* socd_cleaner_binds[SOCD_CLEANERS_LEN]  = {left_index_mid,     left_middle_mid, left_ring_mid,                           left_pinky_mid,             left_middle_top};
+std::string socd_cleaner_names[SOCD_CLEANERS_LEN] = {"no socd cleaning", "neutral socd",  "left + right = neural, up + down = up", "last input priority socd", "b0xx - neutral socd w/ travel time"};
+
+
+
 
 
 /* DO NOT EDIT */
 int active_keys_arr[ROWS * COLS][2];
 int active_keys_len = 0;
 bool inMatrix(const int *matrix_coord);
+
+void leverLayout(SocdCleaner socd_cleaner);
+void hitboxLayout(SocdCleaner socd_cleaner);
+void wasdHitboxLayout(SocdCleaner socd_cleaner);
+void b0xxLayout(SocdCleaner socd_cleaner);
 /* DO NOT EDIT */
 
 
 
-BleGamepad ble_gamepad("stickb0xx", "jsong1b", 100);
+std::string ble_gamepad_name = "stickb0xx";
+BleGamepad ble_gamepad(ble_gamepad_name);
 
 
 
-const int* hybrid_stick_layout_coords[12] = {right_index_mid, right_index_bot, right_middle_mid, right_middle_bot, right_ring_mid, right_ring_bot, right_pinky_mid, right_pinky_bot, left_pinky_top, right_ring_top, right_index_top, right_middle_top};
-const int hybrid_stick_layout_buttons[12] = {BUTTON_4,        BUTTON_1,        BUTTON_5,         BUTTON_2,         BUTTON_8,       BUTTON_10,      BUTTON_7,        BUTTON_9,        BUTTON_12,      BUTTON_11,      BUTTON_14,       BUTTON_15};
-void hybridStickLayout() {
-    for (int i = 0; i < 12; i++) {
-        if (inMatrix(hybrid_stick_layout_coords[i]) == true) ble_gamepad.press(hybrid_stick_layout_buttons[i]);
-        else ble_gamepad.release(hybrid_stick_layout_buttons[i]);
+#define LAYOUTS_LEN 4
+const int* layouts_binds[LAYOUTS_LEN]              = {right_index_mid, right_middle_mid, right_ring_mid,        right_pinky_mid};
+void (*layout_functions[LAYOUTS_LEN])(SocdCleaner) = {&leverLayout,    &hitboxLayout,    &wasdHitboxLayout,     &b0xxLayout};
+std::string layouts_names[LAYOUTS_LEN]             = {"lever layout",  "hitbox layout",  "wasd hitbox layout", "b0xx layout"};
 
-        /* ================  UP     DOWN   LEFT   RIGHT  ===== */
-        int dpad_state[4] = {false, false, false, false};
 
-        if (inMatrix(lever_up) == true || inMatrix(left_middle_top) == true || inMatrix(thumb_middle) == true) dpad_state[0] = true;
-        if (inMatrix(lever_down) == true || inMatrix(left_middle_mid) == true)                                 dpad_state[1] = true;
-        if (inMatrix(lever_left) == true || inMatrix(left_ring_mid) == true)                                   dpad_state[2] = true;
-        if (inMatrix(lever_right) == true || inMatrix(left_index_mid) == true)                                 dpad_state[3] = true;
 
-        /* LEFT + RIGHT => NEUTRAL, UP + DOWN => UP */
-        if (dpad_state[0] == true) {
-            if (dpad_state[2] == true && dpad_state[3] == false)      ble_gamepad.setHat1(DPAD_UP_LEFT);
-            else if (dpad_state[3] == true && dpad_state[2] == false) ble_gamepad.setHat1(DPAD_UP_RIGHT);
-            else                                                      ble_gamepad.setHat1(DPAD_UP);
-        } else if (dpad_state[1] == true) {
-            if (dpad_state[2] == true && dpad_state[3] == false)      ble_gamepad.setHat1(DPAD_DOWN_LEFT);
-            else if (dpad_state[3] == true && dpad_state[2] == false) ble_gamepad.setHat1(DPAD_DOWN_RIGHT);
-            else                                                      ble_gamepad.setHat1(DPAD_DOWN);
-        }
-        else if (dpad_state[2] == true && dpad_state[3] == false) ble_gamepad.setHat1(DPAD_LEFT);
-        else if (dpad_state[3] == true && dpad_state[2] == false) ble_gamepad.setHat1(DPAD_RIGHT);
-        else                                                      ble_gamepad.setHat1(DPAD_CENTERED);
-    }
-    const int* test = hybrid_stick_layout_coords[0];
+void leverLayout(SocdCleaner socd_cleaner) {
+    Serial.println("leverLayout");
+    return;
+}
+
+void hitboxLayout(SocdCleaner socd_cleaner) {
+    Serial.println("hitboxLayout");
+    return;
+}
+
+void wasdHitboxLayout(SocdCleaner socd_cleaner) {
+    Serial.println("wasdHitboxLayout");
+    return;
+}
+
+void b0xxLayout(SocdCleaner socd_cleaner) {
+    Serial.println("b0xxLayout");
+    return;
 }
 
 
