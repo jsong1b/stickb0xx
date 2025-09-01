@@ -6,7 +6,7 @@
 
 
 void (*layout)(SocdCleaner) = NULL;
-SocdCleaner socd_cleaner = NONE;
+SocdCleaner socd_cleaner = NEUTRAL;
 
 
 
@@ -29,13 +29,15 @@ void setup() {
     Serial.begin(115200);
     delay(1000);
     Serial.println("serial up");
+
+    ble_gamepad.begin();
+    delay(1000);
+    Serial.println("blegamepad up");
 }
 
 void loop() {
     scanMatrix();
     if (print_matrix == true) printActiveKeys();
-
-    Serial.println(in_layout_switcher);
 
     if (in_layout_switcher == false) {
         in_layout_switcher = true;
@@ -48,17 +50,13 @@ void loop() {
         }
 
         if (in_layout_switcher == true) {
-                ble_gamepad.end();
-                ble_gamepad_name = "stickb0xx";
-                ble_gamepad = BleGamepad(ble_gamepad_name);
-                delay(1000);
             layout = NULL;
+            delay(1000);
         } else (*layout)(socd_cleaner);
     } else {
-
+        Serial.println("in layout switcher");
         for (int i = 0; i < LAYOUTS_LEN; i++) {
             if (inMatrix(layouts_binds[i]) == true) {
-                ble_gamepad_name += " - " + layouts_names[i];
                 layout = layout_functions[i];
                 break;
             }
@@ -67,18 +65,14 @@ void loop() {
         bool new_socd_cleaner = false;
         for (int i = 0; i < SOCD_CLEANERS_LEN; i++) {
             if (inMatrix(socd_cleaner_binds[i]) == true) {
-                ble_gamepad_name += " - " + socd_cleaner_names[i];
                 socd_cleaner = (SocdCleaner)i;
                 new_socd_cleaner = true;
                 break;
             }
         }
-        if (new_socd_cleaner == false) ble_gamepad_name += " - " + socd_cleaner_names[(int)socd_cleaner];
 
         if (layout != NULL) {
-            ble_gamepad = BleGamepad(ble_gamepad_name);
             in_layout_switcher = false;
-            ble_gamepad.begin();
             delay(1000);
         }
     }
